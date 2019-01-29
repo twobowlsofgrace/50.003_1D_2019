@@ -19,6 +19,8 @@ Implement a web application that acts as a support ticket system for the APIs av
 3. Will we be having an access to these APIs in a sandboxed environment to test our code?
 4. Which kind of email should the system be integrated with?
 5. For ease of handover, any preferred web servers and databases?
+
+
 (zhaohong)
 6. If user need to create an account before submitting information?
 7. Any requirements for UI style?
