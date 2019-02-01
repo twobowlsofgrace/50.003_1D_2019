@@ -13,14 +13,13 @@ Implement a web application that acts as a support ticket system for the APIs av
 
 
 
-### Questions (Jun De)
-1. How many types of tickets will be sent from the APIs? May we have a sample of the tickets the system should be prepared for?
-2. Can we have a list of all APIs connected to this support ticket system, and their respective documentations?
-3. Will we be having an access to these APIs in a sandboxed environment to test our code?
-4. Which kind of email should the system be integrated with?
-5. For ease of handover, any preferred web servers and databases?
-6. What is 'manage tickets'?
-
-##(zhaohong)
-6. If user need to create an account before submitting information?
-7. Any requirements for UI style?
+### Questions
+1. May we have a sample of the tickets the system should be prepared for?
+2. Which kind of email should the system be integrated with?
+3. For ease of handover, any preferred web servers and databases?
+4. What is 'manage tickets'?
+5. Any requirements for UI style?
+6. Will the tickets be created by users or automatically created through the API itself?
+7. How should we be retrieving tickets? Will viewing tickets be considered as retrieval?
+8. Would having a history of resolved tickets be necessary or an extension of the project requirements?
+9. Can the priority of tickets be changed by users, administrators, the backend program of the web app or all three?
