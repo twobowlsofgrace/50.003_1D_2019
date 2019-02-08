@@ -8,6 +8,10 @@ Note: Everyone is free to edit this README as well to share resources and docume
     - templates contains html files that are displayed when we load the site
   - To run website locally, get into website/ dir and execute:
     python3 manage.py runserver
+  - Created an account using Django's native user management system. This is the only account that we can log into at the moment.
+    Username: superuser
+    Password: 1234
+    Email address: test.email.com
 - As we'll have to display the usage of the website across multiple users at the same time, it would be a better idea to host the website somewhere instead of locally. To this end I recommend we use a free service called Heroku to do this (to be implemented).
 - As each of us have different python modules (including the server in Heroku), it is a good time to learn about Dockers, a solution that abstracts dependencies, and any codes required to run prior to the start of the website. With dockers the website, we script the downloading of dependencies and run any codes that is required prior to the set up of the website once, so that in the future we can kickstart websites with just a line of code. This is still something I'm working on, but it will be a good idea for you to read some guides below to get an idea of what Dockers is about.
 
