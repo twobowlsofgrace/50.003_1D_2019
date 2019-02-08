@@ -1,7 +1,7 @@
 # For team mates
 Note: Everyone is free to edit this README as well to share resources and document important changes for others to read.
 
-### Recent Changes (9/2)
+### Recent Changes (9/2/19)
 - Rewritten website using Django (sorry again for not agreeing on this earlier).
   - Website currently contains 2 folders
     - my_project contains the network and website settings
