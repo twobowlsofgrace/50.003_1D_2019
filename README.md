@@ -38,4 +38,6 @@ https://docs.djangoproject.com/en/2.1/topics/auth/default/
 https://docs.google.com/document/d/1GTbBhWj93e7oUoBi-i61dFe4V-oUggdwZ14g6ruBGlA/edit?usp=sharing
 - Docker's beginner guide
 https://docs.docker.com/get-started/part2/
+- Using JWT authentication on Django framework
+https://simpleisbetterthancomplex.com/tutorial/2018/12/19/how-to-use-jwt-authentication-with-django-rest-framework.html
 
