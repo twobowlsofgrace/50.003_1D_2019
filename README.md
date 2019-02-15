@@ -1,5 +1,6 @@
 # For team mates
 Note: Everyone is free to edit this README as well to share resources and document important changes for others to read.
+Whenever a new use case is being worked on, create a new branch, and only merge it with the master branch when the code passes the tests you've written for. When addional code is added to our master branch, we assume the pre-existing code already works. For any help for using git, feel free to drop me (junde) a question :D
 
 ### Recent Changes (9/2/19)
 - Rewritten website using Django (sorry again for not agreeing on this earlier).
@@ -22,6 +23,8 @@ Note: Everyone is free to edit this README as well to share resources and docume
 ### Considerations
 - Possibly host web page on heroku when displaying to client
 - Possibly use PivotalTracker to keep track of code progress
+- Possibly automate creation of issues on Github
+- Possibly automate creation of statistics based on the forms that are filled
 
 ### Resources
 - Google Drive
