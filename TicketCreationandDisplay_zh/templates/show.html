@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <table>
+    <tr>
+        <th>user</th>
+        <th>title</th>
+        <th>description</th>
+    </tr>
+    {% for line in list %}
+    <tr>
+        <td>{{line.user}}</td>
+        <td>{{line.title}}</td>
+        <td>{{ line.description }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+</body>
+</html>
