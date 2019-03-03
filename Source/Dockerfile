@@ -1,4 +1,4 @@
-FROM python:3.6.8-slim
+FROM mysql:5.6
 
 # Set working directory to /app
 WORKDIR /app
@@ -7,7 +7,9 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r  requirements.txt
+RUN apt-get -y update && apt-get -y install python3 python3-pip
+RUN pip3 install --upgrade pip
+RUN pip3 install --trusted-host pypi.python.org -r  requirements.txt
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
