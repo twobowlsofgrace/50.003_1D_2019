@@ -43,4 +43,6 @@ https://docs.google.com/document/d/1GTbBhWj93e7oUoBi-i61dFe4V-oUggdwZ14g6ruBGlA/
 https://docs.docker.com/get-started/part2/
 - Using JWT authentication on Django framework
 https://simpleisbetterthancomplex.com/tutorial/2018/12/19/how-to-use-jwt-authentication-with-django-rest-framework.html
+- Other open sourced versions of Django helpdesks 
+https://django-helpdesk.readthedocs.io/en/master/index.html
 
