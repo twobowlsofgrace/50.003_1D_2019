@@ -1,3 +1,21 @@
+##### 11/3
+- Managed to set up mysql on django with zhaohong's help
+- Run
+```sudo apt-get install mysql-server```
+- If you cant log in, try finding account info of "debian-sys-maint" and log in using that, it has root privileges and can let you reset root password
+- If you're logging in root, run
+```sudo mysql -u root -p```
+then insert new password
+- Create new user (according to our settings.py) and new database `50003`. Rmb use ` .
+- run
+```
+$ pip3 install mysqlclient
+$ python3 manage.py migrate
+$ python3 manage.py runserver
+```
+
+
+
 ##### 3/3
 - Tried to use docker to set up mysql, died so hard am gna continue some other time
 - Used mysql base but when i run docker image there's no response, even when i get the port right. I suspect running mysql docker runs something else that i do not know of, need to find out more
