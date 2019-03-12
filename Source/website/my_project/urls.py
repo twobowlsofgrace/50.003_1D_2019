@@ -20,20 +20,14 @@ from django.urls import path, include
 from django.views.generic.base import TemplateView
 from createuser.views import get_user
 from ticket_creation.views import create, list,delete
-from login.views import index
-from home.views import home
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
 
-
-    url(r'^login/', index, name="login"),
-    url(r'^home/', home,name="home"),
-    url(r'^createuser/', get_user,name="createuser"),
-    url(r'^createticket/', create, name="createticket"),
-    url(r'^display/', list, name="display"),
-    url(r'^delete/', delete, name="delete"),
-
+    path('home/', include('home.urls'), name='home'),
+    path('login/', include('login.urls'), name='login'),
+    path('createuser/', include('createuser.urls'), name='createuser'),
+    path('ticket_creation/', include('ticket_creation.urls'), name='ticket_creation'),
 ]
