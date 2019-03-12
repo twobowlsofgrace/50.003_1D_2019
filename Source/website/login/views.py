@@ -6,9 +6,9 @@ from django.urls import reverse
 from .forms import LoginForm
 
 def index(request):
-    #if request.user.is_authenticated:
-    #    return HttpResponseRedirect('/home/')
-    #else:
+    if (request.user.is_authenticated):
+        return HttpResponseRedirect(reverse("home:index"))
+    else:
         if request.method == 'POST':
             form = LoginForm(request.POST)
 
