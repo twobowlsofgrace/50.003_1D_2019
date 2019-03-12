@@ -13,7 +13,9 @@ $ pip3 install mysqlclient
 $ python3 manage.py migrate
 $ python3 manage.py runserver
 ```
-
+- Implementing pass test case for createuser now (in /Source/website/createuser/tests.py)
+Test was not detected when ```python3 manage.py test createuser``` is run
+https://docs.djangoproject.com/en/2.1/intro/tutorial05/
 
 
 ##### 3/3
