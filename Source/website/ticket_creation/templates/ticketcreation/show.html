@@ -66,7 +66,7 @@
             btn:['Yes','No'],
             yes: function(index,layero){
                 $.ajax({
-                    url: '{% url 'delete' %}',
+                    url: '{% url 'ticket_creation:delete' %}',
                     type:'POST',
                     data: {'column_id':column_id},
                     success:function (e){
