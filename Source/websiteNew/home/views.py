@@ -12,8 +12,7 @@ def home(request):
             return render(request, 'home/index.html')
         else:
             # user is normal user
-            return render(request, 'home/index_normal.html')
+            return render(request, 'home/index.html')
     else:
         # user has not logged in, redirect to login page
         return HttpResponseRedirect(reverse('login:index'))
-

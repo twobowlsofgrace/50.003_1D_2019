@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -11,19 +11,23 @@ from django.contrib import messages
 def create(request):
 	if (request.user.is_authenticated):
 		# user is logged in
-		if request.method == 'POST':
-			id = 5
-			username = request.user.username
-			title = request.POST.get("title")
-			print(username)
-			email = request.POST.get('email')
-			description = request.POST.get('description')
-			print(username)
-			ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description,
-								   user=username)
-			ticket.save()
-			messages.add_message(request, messages.SUCCESS, 'Create Successful')
-		return render(request, 'ticketcreation/creation.html')
+		if not (request.user.is_superuser):
+			# user is normal user
+			if request.method == 'POST':
+				id = 5
+				username = request.POST.get("username")
+				title = request.POST.get("title")
+				print(username)
+				email = request.POST.get('email')
+				description = request.POST.get('description')
+				print(username)
+				ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=username)
+				ticket.save()
+				messages.add_message(request, messages.SUCCESS, 'Create Successful')
+				return render(request, 'ticketcreation/creation.html')
+		else:
+			# user is superuser
+			return HttpResponseForbidden()
 	else:
 		return HttpResponseRedirect(reverse("login:index"))
 
@@ -76,21 +80,3 @@ def delete(request):
 	else:
 		return HttpResponseRedirect(reverse("login:index"))
 
-
-def resolve(request):
-	if (request.user.is_authenticated):
-		# user is logged in
-		if (request.user.is_superuser):
-			column_id = request.GET.get("id")
-			try:
-				models.Ticket.objects.filter(id=column_id).update(resolved=1)
-
-			except:
-				raise HttpResponse(0)
-			list = models.Ticket.objects.all()
-			return render(request, 'ticketcreation/show.html', {"list": list})
-		else:
-			# user is normal user
-			return HttpResponseRedirect(reverse("home:index"))
-	else:
-		return HttpResponseRedirect(reverse("login:index"))
