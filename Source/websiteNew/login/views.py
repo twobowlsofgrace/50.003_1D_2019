@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
@@ -41,7 +42,7 @@ def index(request):
 def log_out(request):
     logout(request)
 
-    return render(request, 'login/not_logged_in.html', {'form':LoginForm()})
+    return HttpResponseRedirect(reverse("login:index"))
 
 
 
