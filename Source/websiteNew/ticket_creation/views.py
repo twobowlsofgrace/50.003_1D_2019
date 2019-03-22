@@ -6,6 +6,8 @@ from . import models
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
+from input_field_test import Input_field_test
+
 
 error_message = None
 error_message_forbidden_administrator = "This feature is not available to administrators"
@@ -20,13 +22,16 @@ def create(request):
 		if not (request.user.is_superuser):
 			# user is normal user
 			if request.method == 'POST':
+				username_validity = []
+				title_validity = []
+				email_validity = []
+				description_validity = []
+
 				id = 5
 				username = request.POST.get("username")
 				title = request.POST.get("title")
-				print(username)
 				email = request.POST.get('email')
 				description = request.POST.get('description')
-				print(username)
 				ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=username)
 				ticket.save()
 				messages.add_message(request, messages.SUCCESS, 'Create Successful')
