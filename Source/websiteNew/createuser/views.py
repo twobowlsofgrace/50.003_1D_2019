@@ -19,8 +19,6 @@ def get_user(request):
 
 	if request.method == 'POST':
 		# all variables declared here
-		valid_input = False
-		empty_input = False
 		username_validity = []
 		password_validity = []
 		email_validity = []

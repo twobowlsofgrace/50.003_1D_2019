@@ -195,14 +195,54 @@ class Input_field_test:
 
 		return output
 
+	def ticket_title(self, input_value):
+		"""
+		Public method
+		Return True if input_value is empty, False otherwise
+		"""
+		output = []
+		pass_fail_state = True
+
+		if not self.empty_test_pass(input_value):
+			if pass_fail_state:
+				pass_fail_state = False
+				output.append("fail")
+			output.append("empty")
+			return output
+
+		if pass_fail_state:
+			output.append("pass")
+
+		return output
 
 
+	def ticket_description(self, input_value):
+		"""
+		Public method
+		Return True if input_value is empty, False otherwise
+		"""
+		output = []
+		pass_fail_state = True
+
+		if not self.empty_test_pass(input_value):
+			if pass_fail_state:
+				pass_fail_state = False
+				output.append("fail")
+			output.append("empty")
+			return output
+
+		if pass_fail_state:
+			output.append("pass")
+
+		return output
 
 
-
-
-
-
+	def ticket_id(self, input_value):
+		"""
+		Public method
+		Return True if input_value is empty, False otherwise
+		"""
+		pass
 
 
 
