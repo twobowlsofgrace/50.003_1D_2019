@@ -1,3 +1,9 @@
+#### 22/3
+- Things that're standardized:
+--- Loading of templates - render for templates within the app, httpresponseredirect for templates outside the particular app
+--- Error messages in templates - By default, error_message is in template is None
+
+
 ##### 11/3
 - Managed to set up mysql on django with zhaohong's help
 - Run
