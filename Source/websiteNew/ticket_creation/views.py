@@ -9,7 +9,7 @@ from django.contrib import messages
 
 error_message = None
 error_message_forbidden_administrator = "This feature is not available to administrators"
-error_message_forbidden_non-administrator = "This feature is not available to non-administrators"
+error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
 
 
 
@@ -47,7 +47,7 @@ def list(request):
 			return render(request, 'ticketcreation/show.html', {"list": list, 'error_message':error_message})
 		else:
 			# user is normal user
-			return HttpResponseForbidden(error_message_forbidden_non-administrator)
+			return HttpResponseForbidden(error_message_forbidden_nonadministrator)
 	else:
 		# user is not logged in
 		return HttpResponseRedirect(reverse("login:index"))
