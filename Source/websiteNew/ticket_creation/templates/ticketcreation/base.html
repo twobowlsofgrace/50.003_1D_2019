@@ -28,6 +28,9 @@
         </li>
       </ul>
     </nav>
+  {% if error_message %}
+    <h5>{{error_message}}</h5>
+  {% end if %}
   {% block content %}
     {% endblock %}
   </body>
