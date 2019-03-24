@@ -36,6 +36,8 @@ def create(request):
 				ticket.save()
 				messages.add_message(request, messages.SUCCESS, 'Create Successful')
 				return render(request, 'ticketcreation/creation.html', {'error_message':error_message})
+			else:
+				return render(request, 'ticketcreation/creation.html', {'error_message':error_message})
 		else:
 			# user is superuser
 			return HttpResponseForbidden(error_message_forbidden_administrator)
