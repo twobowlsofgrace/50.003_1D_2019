@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ticket_creation',
     'Profile',
+    #'notifier',
+
 
 ]
 
@@ -82,7 +84,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': '50003',
-        'USER': 'root',
+        'USER': 'user1',
         'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '3306',
@@ -128,7 +130,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 # Added to redirect user after a successful login
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+# Notifier backends for Email and SMS
+# NOTIFIER_BACKENDS = (
+#     'notifier.backends.EmailBackend',
+#     'path.to.custom.backend.CustomBackend',
+# )
+
+# Email backend
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = '1025'
+# EMAIL_HOST_USER = 'admin@example.com'
+# EMAIL_HOST_PASSWORD = 'mys3cr3tp4ssw0rd'
+# EMAIL_USE_TLS = True

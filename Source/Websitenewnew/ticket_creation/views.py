@@ -6,6 +6,10 @@ from . import models
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
+# email
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+
 
 @csrf_exempt
 def create(request):
@@ -23,6 +27,8 @@ def create(request):
 								   user=username)
 			ticket.save()
 			messages.add_message(request, messages.SUCCESS, 'Create Successful')
+			send_mail(title,'New ticket created\n' + description,email,['admin@example.com'],fail_silently=False)
+
 		return render(request, 'ticketcreation/creation.html')
 	else:
 		return HttpResponseRedirect(reverse("login:index"))
