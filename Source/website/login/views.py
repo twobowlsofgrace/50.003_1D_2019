@@ -81,6 +81,5 @@ def index(request):
 	return render(request, 'login/not_logged_in.html', {'form':LoginForm(), 'error_message':error_message})
 
 def log_out(request):
-	error_message = None
 	logout(request)
 	return HttpResponseRedirect(reverse('login:index'))
