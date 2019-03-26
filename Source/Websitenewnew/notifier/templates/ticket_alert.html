@@ -1,0 +1,16 @@
+{% comment %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>{% endcomment %}
+
+{% if back_up %}
+Hi {{name}}, the website {{site_name}} [{{site_link}}] is back up at {{when}}.
+{% else %}
+Hi {{name}}, the website {{site_name}} [{{site_link}}] is down at {{when}}.
+{% endif %}

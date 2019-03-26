@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
+from notifier.views import send_sms
 
 from . import models
 from django.views.decorators.csrf import csrf_exempt
@@ -21,6 +22,7 @@ def create(request):
 			title = request.POST.get("title")
 			print(username)
 			email = request.POST.get('email')
+			phonenumber = request.POST.get('phoneNumber')
 			description = request.POST.get('description')
 			print(username)
 			ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description,
@@ -28,6 +30,7 @@ def create(request):
 			ticket.save()
 			messages.add_message(request, messages.SUCCESS, 'Create Successful')
 			send_mail(title,'New ticket created\n' + description,email,['admin@example.com'],fail_silently=False)
+			send_sms(phonenumber,messages,content={},template=None)
 
 		return render(request, 'ticketcreation/creation.html')
 	else:
