@@ -33,7 +33,7 @@ def get_user(request):
                         username = request.POST.get('username')
                         password = request.POST.get('password')
                         email = request.POST.get('email')
-                        phonenumber = request.POST.get('phonenumber')
+                        phonenumber = request.POST.get('phoneNumber')
                 except ValueError:
                         pass
 
@@ -90,10 +90,10 @@ def get_user(request):
                                 # input fields have invalid input
                                 error_message = error_message_invalid_input
 
-                return render(request, 'createuser/user.html', {'error_message':error_message})
+                messages.error(request, error_message)
 
 	# if a GET (or any other method) we'll create a blank form
 	else:
 		form = UserForm()
 
-	return render(request, 'createuser/user.html', {'error_message':error_message})
+	return render(request, 'createuser/user.html', {'error_message':None})
