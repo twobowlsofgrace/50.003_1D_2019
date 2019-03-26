@@ -16,6 +16,7 @@ error_message_invalid_input = "Please ensure input fields are valid"
 
 @csrf_exempt
 def get_user(request):
+	error_message = None
 	#messages.add_message(request, messages.ERROR, 'User Exist!')
 	if request.method == 'POST':
                 # all variables declared here
@@ -72,6 +73,11 @@ def get_user(request):
                                 elif i == "invalid value":
                                         invalid_input_state = True
                         for i in email_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in phonenumber_validity:
                                 if i == "empty":
                                         empty_input_state = True
                                 elif i == "invalid value":
