@@ -13,6 +13,11 @@ error_message_forbidden_administrator = "This feature is not available to admini
 error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
 
 
+def remote_create(request):
+        print("@@@@@@@@")
+        print(request)
+        return None
+
 
 @csrf_exempt
 def create(request):

@@ -5,6 +5,9 @@ from django.urls import reverse
 from .forms import BasicForm
 from input_field_test import Input_field_test
 
+import urllib
+
+
 error_message_success = "Form submitted!"
 error_message_empty_input = "Please fill in all input fields"
 error_message_invalid_input = "Please ensure input fields are valid"
@@ -88,4 +91,5 @@ def basic_form(request):
 		return render(request, 'forms/index.html', {'form': form, 'error_message':error_message})
 	else:
 		form = BasicForm()
+		print(urllib.request("127.0.0.1:3000/ticket_creation/remote_create", headers={'key int':1, 'key string':"sample string"}))
 		return render(request, 'forms/index.html', {'form': form, 'error_message':error_message})
