@@ -1,14 +1,15 @@
 class Input_field_test:
 	"""
 	Test types: (String) username, password, email, phonenumber
+
 	Return: A list that contains
 	  'pass' if input fields passes,
 	  'fail' if input field fails,
 	  'invalid value' if invalid values are given,
 	  'empty' if input fields are empty
+
 	The idea is to check output length, if its more than one, it's a fail
 	"""
-
 
 	def empty_test_pass(self, input_value):
 		"""
@@ -39,7 +40,8 @@ class Input_field_test:
 	def alphabets_numbers_space_only(self, input_value):
 		"""
 		Private method
-		Returns True if characters in input_value string is only alphabets, numbers and space, False otherwise
+		Returns True if characters in input_value string is only alphabets and numbers, False otherwise
+
 		ord values of characters:
 		a - 97
 		z - 122
@@ -48,6 +50,7 @@ class Input_field_test:
 		0 - 48
 		9 - 57
 		space - 32
+
 		Note: The " " character fails the test
 		"""
 		output = True
@@ -123,7 +126,7 @@ class Input_field_test:
 	def email(self, input_value):
 		"""
 		Public method
-		Returns True if input_value is not empty string, input_value
+		Returns True if input_value is not empty string, input_value 
 		  contains only alphabets and numbers, and one '@'
 		"""
 		output = []
@@ -241,26 +244,12 @@ class Input_field_test:
 		pass
 
 
-	def token(self, input_token):
-		"""
-		Public method
-		For verifying that the post request reaching to our remote_create in ticket_create
-		is from one of the remote forms we've created
-		"""
-		output = []
-		pass_fail_state = True
 
-		forms_token = "UKJHhgvIU&^%$bvd#$HJ"
-		token_list = [forms_token]
 
-		if input_token in token_list:
-			pass_fail_state = True
-			output.append("pass")
-		else:
-			pass_fail_satte = False
-			output.append("fail")
-			output.append("invalid value")
 
-		return output
+
+
+
+
 
 
