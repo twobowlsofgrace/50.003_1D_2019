@@ -9,6 +9,7 @@ class Input_field_test:
 	The idea is to check output length, if its more than one, it's a fail
 	"""
 
+
 	def empty_test_pass(self, input_value):
 		"""
 		Private method
@@ -35,10 +36,10 @@ class Input_field_test:
 		return output
 
 
-	def alphabets_numbers_only(self, input_value):
+	def alphabets_numbers_space_only(self, input_value):
 		"""
 		Private method
-		Returns True if characters in input_value string is only alphabets and numbers, False otherwise
+		Returns True if characters in input_value string is only alphabets, numbers and space, False otherwise
 		ord values of characters:
 		a - 97
 		z - 122
@@ -46,6 +47,7 @@ class Input_field_test:
 		Z - 90
 		0 - 48
 		9 - 57
+		space - 32
 		Note: The " " character fails the test
 		"""
 		output = True
@@ -58,6 +60,9 @@ class Input_field_test:
 				pass
 			elif ord(i) >= 48 and ord(i) <= 57:
 				# character is number
+				pass
+			elif ord(i) == 32:
+				# character is space
 				pass
 			else:
 				output = output and False
@@ -81,7 +86,7 @@ class Input_field_test:
 			output.append("empty")
 			return output
 
-		if not self.alphabets_numbers_only(input_value):
+		if not self.alphabets_numbers_space_only(input_value):
 			if pass_fail_state:
 				pass_fail_state = False
 				output.append("fail")
@@ -234,3 +239,28 @@ class Input_field_test:
 		Return True if input_value is empty, False otherwise
 		"""
 		pass
+
+
+	def token(self, input_token):
+		"""
+		Public method
+		For verifying that the post request reaching to our remote_create in ticket_create
+		is from one of the remote forms we've created
+		"""
+		output = []
+		pass_fail_state = True
+
+		forms_token = "UKJHhgvIU&^%$bvd#$HJ"
+		token_list = [forms_token]
+
+		if input_token in token_list:
+			pass_fail_state = True
+			output.append("pass")
+		else:
+			pass_fail_satte = False
+			output.append("fail")
+			output.append("invalid value")
+
+		return output
+
+

@@ -37,7 +37,7 @@ class Input_field_test:
 		return output
 
 
-	def alphabets_numbers_only(self, input_value):
+	def alphabets_numbers_space_only(self, input_value):
 		"""
 		Private method
 		Returns True if characters in input_value string is only alphabets and numbers, False otherwise
@@ -49,6 +49,7 @@ class Input_field_test:
 		Z - 90
 		0 - 48
 		9 - 57
+		space - 32
 
 		Note: The " " character fails the test
 		"""
@@ -62,6 +63,9 @@ class Input_field_test:
 				pass
 			elif ord(i) >= 48 and ord(i) <= 57:
 				# character is number
+				pass
+			elif ord(i) == 32:
+				# character is space
 				pass
 			else:
 				output = output and False
@@ -85,7 +89,7 @@ class Input_field_test:
 			output.append("empty")
 			return output
 
-		if not self.alphabets_numbers_only(input_value):
+		if not self.alphabets_numbers_space_only(input_value):
 			if pass_fail_state:
 				pass_fail_state = False
 				output.append("fail")

@@ -9,14 +9,115 @@ from django.contrib import messages
 from input_field_test import Input_field_test
 
 error_message = None
+error_message_success = "Ticket creation success"
+error_message_empty_input = "Please fill in all input fields"
+error_message_invalid_input = "Please ensure input fields are valid"
+error_message_unauthorised = "Not authorised"  # used if the token sent by form does not tally with the one specified in /Source/website/input_field_test.py
 error_message_forbidden_administrator = "This feature is not available to administrators"
 error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
+error_message_unknown_error = "Unknown error"  # thrown when we cant save ticket into model for some reason
 
-
+@csrf_exempt
+# csrf_exempt so that other websites may access this url without acquiring a csrf token
 def remote_create(request):
-        print("@@@@@@@@")
-        print(request)
-        return None
+	"""
+	To be accessed by remote form (/TestForm/forms/views.py).. Checking of input validity will only be done here,
+	not in the form.
+
+	Prepared to receive the following key-values:
+	title - title of ticket
+	description - description of ticket
+	name - Only alphabets
+	phonenumber - Only integers
+	email - Only alphabets, integers, one '@', and multiple '.'
+	token - Any characters, used to validate that the one accessing our url is our forms (specificed in TestForm/forms/views.py and /Source/website/input_field_test.py)
+
+	When input is valid, sends error_message as HttpResponse to form (even if input is valid). Possible error_messages include
+	errro_message_success, errro_message_empty_input, errro_message_invalid_input, errro_message_unauthorised, error_message_unknown_error
+
+	"""
+
+	if (request.method == "POST"):
+                name = None
+                title = None
+                email = None
+                description = None
+                phonenumber = None
+                token = None
+
+
+                try:
+                        name = request.POST.get("name")
+                        title = request.POST.get("title")
+                        email = request.POST.get('email')
+                        phonenumber = request.POST.get('phonenumber')
+                        description = request.POST.get('description')
+                        token = request.POST.get('token')
+                except ValueError:
+                        pass
+
+                input_field_test = Input_field_test()
+                username_validity = input_field_test.username(name)
+                title_validity = input_field_test.ticket_title(title)
+                email_validity = input_field_test.email(email)
+                description_validity = input_field_test.ticket_description(description)
+                phonenumber_validity = input_field_test.phonenumber(phonenumber)
+                token_validity = input_field_test.token(token)
+
+                if (len(username_validity)==1 and len(title_validity)==1 and len(email_validity)==1 and len(description_validity)==1 and len(phonenumber_validity)==1 and len(token_validity)==1):
+                        try:
+                                # input is valid
+                                error_message = error_message_success
+                                ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=name)
+                                ticket.save()
+                        except:
+                                error_message = error_message_unknown_error
+                else:
+                        # input fields are not valid
+                        empty_input_state = False
+                        invalid_input_state = False
+                        invalid_token_state = False
+
+                        for i in username_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in title_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in email_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in description_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in phonenumber_validity:
+                                if i == "empty":
+                                        empty_input_state = True
+                                elif i == "invalid value":
+                                        invalid_input_state = True
+                        for i in token_validity:
+                                if i == "invalid value":
+                                        invalid_token_state = True
+
+                        if invalid_token_state:
+                                # wrong token submitted
+                                error_message = error_message_unauthorised
+                        elif empty_input_state:
+                                # input fields are empty
+                                error_message = error_message_empty_input
+                        elif invalid_input_state:
+                                # input fields have invalid input
+                                error_message = error_message_invalid_input
+
+                return HttpResponse(error_message)
 
 
 @csrf_exempt

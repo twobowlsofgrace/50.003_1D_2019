@@ -5,4 +5,4 @@ class BasicForm(forms.Form):
 	description = forms.CharField(label="Description", max_length=300, widget=forms.TextInput, required=True)
 	name = forms.CharField(label="Name", max_length=20, widget=forms.TextInput, required=True)
 	phonenumber = forms.CharField(label="Phonenumber", max_length=20, widget=forms.TextInput, required=True)
-	email = forms.CharField(label="Email", max_length=50, widget=forms.EmailInput, required=True)
+	email = forms.CharField(label="Email", max_length=50, widget=forms.TextInput, required=True)
