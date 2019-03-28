@@ -132,11 +132,23 @@ def create(request):
                                 email_validity = []
                                 description_validity = []
 
-                                id = 5
-                                username = request.POST.get("username")
-                                title = request.POST.get("title")
-                                email = request.POST.get('email')
-                                description = request.POST.get('description')
+                                input_field_test = Input_field_test()
+
+                                try:
+                                        id = 5
+                                        username = request.POST.get("username")
+                                        title = request.POST.get("title")
+                                        email = request.POST.get('email')
+                                        description = request.POST.get('description')
+                                except ValueError:
+                                        pass
+
+                                username_validity = input_field_test.username(username)
+                                title_validity = input_field_test.ticket_title(title)
+                                email_validity = input_field_test.email(email)
+                                description_validity = input_field_test.ticket_description(description)
+                                # need to check whether notify by email/phonenumber?
+
                                 ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=username)
                                 ticket.save()
                                 messages.add_message(request, messages.SUCCESS, 'Create Successful')
