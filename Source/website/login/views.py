@@ -8,8 +8,6 @@ from input_field_test import Input_field_test
 from login.forms import LoginForm
 from django.contrib import messages
 
-
-
 error_message_incorrect_userpass = "Login failure, username or password is incorrect"
 error_message_empty_input = "Please fill in all input fields"
 error_message_invalid_input = "Please ensure input fields are valid"
