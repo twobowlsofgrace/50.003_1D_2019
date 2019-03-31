@@ -1,0 +1,2 @@
+# remove all files in pycache
+*/__pycache__/*
