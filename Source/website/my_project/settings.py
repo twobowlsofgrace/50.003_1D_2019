@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ticket_creation',
     'Profile',
-
+    'createuser',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +132,6 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+# Change model used for User authentication
+AUTH_USER_MODEL = "createuser.Extended_User"
