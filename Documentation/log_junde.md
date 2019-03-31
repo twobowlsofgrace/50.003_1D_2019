@@ -1,3 +1,9 @@
+#### 1/4
+- Recreated model to handle User data: Extended_User in createuser
+--- createuser_extended-user is a table found in database `50003` in mysql and all fields are present, including phonenumber - hence i'd consider this a successful transition from the classic User model to our Extended_User
+--- Creation of user account and logging in works fine
+
+
 #### 22/3
 - Things that're standardized:
 --- Loading of templates - render for templates within the app, httpresponseredirect for templates outside the particular app

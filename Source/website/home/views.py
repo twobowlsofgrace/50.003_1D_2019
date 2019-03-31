@@ -2,7 +2,7 @@ from audioop import reverse
 
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
-from .createuser.models import Extended_User as User
+from createuser.models import Extended_User as User
 
 def home(request):
         error_message = None
