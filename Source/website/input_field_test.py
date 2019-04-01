@@ -77,8 +77,6 @@ class Input_field_test:
 		output = []
 		pass_fail_state = True
 
-		print("inside test - username value: {0}; username length: {1}; username type: {2}".format(input_value, len(input_value), type(input_value)))
-
 		if not self.empty_test_pass(input_value):
 			if pass_fail_state:
 				pass_fail_state = False
