@@ -5,4 +5,5 @@ class UserForm(forms.Form):
     password = forms.CharField(label="Password", max_length=20, widget=forms.PasswordInput, required=True)
     email = forms.CharField(label="Email", max_length=50, widget=forms.EmailInput, required=True)
     phoneNumber = forms.CharField(label="Phone number", max_length=20, widget=forms.NumberInput, required=True)
-
+    notify_email = forms.BooleanField()
+    notify_sms = forms.BooleanField()

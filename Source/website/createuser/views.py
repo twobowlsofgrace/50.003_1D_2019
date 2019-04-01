@@ -13,6 +13,7 @@ from input_field_test import Input_field_test
 error_message_user_exist = "User already exist"
 error_message_empty_input = "Please fill in all input fields"
 error_message_invalid_input = "Please ensure input fields are valid"
+error_message_notification_check_one = "Please choose to be notified via email, SMS, or both"
 
 @csrf_exempt
 def get_user(request):
@@ -28,12 +29,16 @@ def get_user(request):
                 password = None
                 email = None
                 phonenumber = None
+                notify_email = None
+                notify_sms = None
 
                 try:
                         username = request.POST.get('username')
                         password = request.POST.get('password')
                         email = request.POST.get('email')
                         phonenumber = request.POST.get('phoneNumber')
+                        notify_email = request.POST.get('notify_email')
+                        notify_sms = request.POST.get('notify_sms')
                 except ValueError:
                         pass
 
@@ -49,10 +54,22 @@ def get_user(request):
                         # input fields are valid
                         user=User.objects.filter(username=username)
                         if user.exists()==False:
-                                user = User.objects.create_user(username=username, email=email, password=password, phoneNumber=phonenumber)
-                                user.is_active = True
-                                user.save()
-                                return HttpResponseRedirect(reverse("login:index"))
+                                input_notify_email = False
+                                input_notify_sms = False
+
+                                if notify_email == "True":
+                                        input_notify_email = True
+                                if notify_sms == "True":
+                                        input_notify_sms = True
+
+                                if input_notify_sms or input_notify_email:
+                                        user = User.objects.create_user(username=username, email=email, password=password, phoneNumber=phonenumber, notify_email=input_notify_email, notify_sms=input_notify_sms)
+                                        user.is_active = True
+                                        user.save()
+                                        return HttpResponseRedirect(reverse("login:index"))
+                                else:
+                                        # user did not choose to be notified by sms, email, or both
+                                        error_message = error_message_notification_check_one
 
                         else:
                                 # User already exists

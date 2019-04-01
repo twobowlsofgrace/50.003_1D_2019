@@ -4,6 +4,7 @@
 --- Creation of user account and logging in works fine
 
 
+
 #### 22/3
 - Things that're standardized:
 --- Loading of templates - render for templates within the app, httpresponseredirect for templates outside the particular app
