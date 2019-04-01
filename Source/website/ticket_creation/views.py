@@ -12,6 +12,7 @@ error_message = None
 error_message_success = "Ticket creation success"
 error_message_empty_input = "Please fill in all input fields"
 error_message_invalid_input = "Please ensure input fields are valid"
+error_message_one_checkbox = "Please choose to be notified via SMS, email, or both"
 error_message_unauthorised = "Not authorised"  # used if the token sent by form does not tally with the one specified in /Source/website/input_field_test.py
 error_message_forbidden_administrator = "This feature is not available to administrators"
 error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
@@ -127,7 +128,6 @@ def create(request):
                 if not (request.user.is_superuser):
                         # user is normal user
                         if request.method == 'POST':
-                                username_validity = []
                                 title_validity = []
                                 email_validity = []
                                 description_validity = []
@@ -136,20 +136,16 @@ def create(request):
 
                                 try:
                                         id = 5
-                                        username = request.POST.get("username")
                                         title = request.POST.get("title")
-                                        email = request.POST.get('email')
                                         description = request.POST.get('description')
                                 except ValueError:
                                         pass
 
-                                username_validity = input_field_test.username(username)
                                 title_validity = input_field_test.ticket_title(title)
-                                email_validity = input_field_test.email(email)
                                 description_validity = input_field_test.ticket_description(description)
                                 # need to check whether notify by email/phonenumber?
 
-                                ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=username)
+                                ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
                                 ticket.save()
                                 messages.add_message(request, messages.SUCCESS, 'Create Successful')
                                 return render(request, 'ticketcreation/creation.html', {'error_message':error_message})
