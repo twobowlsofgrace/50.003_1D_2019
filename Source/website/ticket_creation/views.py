@@ -5,6 +5,11 @@ from django.urls import reverse
 from . import models
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from email_notif.views import email_from_admin
+from email_notif.views import email_to_admin
+from email_notif.views import email_to_user
+
+from createuser.models import Extended_User
 
 from input_field_test import Input_field_test
 
@@ -148,6 +153,10 @@ def create(request):
                                 ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
                                 ticket.save()
                                 messages.add_message(request, messages.SUCCESS, 'Create Successful')
+                                email_to_admin(request) # uses mail_admins
+                                email_to_user(request) # uses send_mail
+
+
                                 return render(request, 'ticketcreation/creation.html', {'error_message':error_message})
                         else:
                                 return render(request, 'ticketcreation/creation.html', {'error_message':error_message})
