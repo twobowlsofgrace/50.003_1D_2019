@@ -1,0 +1,25 @@
+Hello!
+
+So for this Vue project,
+it makes use of a few things
+
+1) Vue CLI3
+2) Vuetify
+
+which you have to install ^
+
+To run the project,
+cd acentureist
+npm run serve
+
+(In case you want to create a new project and want it to be compatible)
+As for the features that was selected when I setup the project, I did a manual selection of
+Babel,  Linter, Router
+
+Use history mode for router: Yes
+Pick Additional lint features: Lint on save
+Where do you prefer placing config for babel, PostCSS, EsLint, etc? : in package.json
+
+
+
+
