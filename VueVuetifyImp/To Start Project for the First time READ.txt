@@ -22,7 +22,7 @@ Where do you prefer placing config for babel, PostCSS, EsLint, etc? : in package
 
 
 
-// Test commit verification -ignore this line
+
 
 
 
