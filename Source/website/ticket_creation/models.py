@@ -19,6 +19,10 @@ class All_Tickets(models.Model):
     queue_number = models.IntegerField()  # to be implemented in future
 
 class Ticket_Details(models.Model):
+    # represent model that contains all replies and tickets
+    ticket_id = models.IntegerField(max_length=20)  # represent unique id of ticket in All_Tickets
+    thread_queue_number = models.IntegerField(max_length=20)  # in a thread (of replies under a ticket, queue number represents the order of replies, starting from 0 (the original ticket itself))
+    author_id = models.IntegerField(max_length=20)  # represent id of the user, stated in the table 'createuser_extended_user' in database 50003
     title = models.CharField(max_length=60)
     description = models.CharField(max_length=256)
     image = models.ImageField(max_length=100)  # to be implemented

@@ -20,6 +20,21 @@ To do:
 - Add automatic account creation when new ticket is created
 
 
+Note: to delete all existing databases:
+```
+$ sudo mysql -u root -p
+$ USE `50003`;
+$ DROP TABLE create_extended_user;
+$ DROP TABLE create_extended_user_groups;
+$ DROP TABLE create_extended_user_user_permissions;
+$ DROP TABLE ticket_creation_all_tickets;
+$ DROP TABLE ticket_creation_ticket;
+$ DROP TABLE ticket_creation_ticket_details;
+
+```
+
+
+
 #### 1/4
 - Recreated model to handle User data: Extended_User in createuser
 --- createuser_extended-user is a table found in database `50003` in mysql and all fields are present, including phonenumber - hence i'd consider this a successful transition from the classic User model to our Extended_User
