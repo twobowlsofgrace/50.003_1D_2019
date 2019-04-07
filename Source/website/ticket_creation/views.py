@@ -81,7 +81,9 @@ def create_new(request):
                 token_validity = input_field_test.token(token)
 
                 if (len(username_validity)==1 and len(title_validity)==1 and len(email_validity)==1 and len(description_validity)==1 and len(phonenumber_validity)==1 and len(token_validity)==1):
-                        test_pass = True
+                        ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
+                        ticket.save()
+                        messages.add_message(request, messages.SUCCESS, error_message_success)
                 else:
                         # input fields are not valid
                         empty_input_state = False
@@ -251,7 +253,9 @@ def create(request):
                 token_validity = input_field_test.token(token)
 
                 if (len(username_validity)==1 and len(title_validity)==1 and len(email_validity)==1 and len(description_validity)==1 and len(phonenumber_validity)==1 and len(token_validity)==1):
-                        test_pass = True
+                        ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
+                        ticket.save()
+                        messages.add_message(request, messages.SUCCESS, error_message_success)
                 else:
                         # input fields are not valid
                         empty_input_state = False
