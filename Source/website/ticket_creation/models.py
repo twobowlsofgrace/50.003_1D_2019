@@ -23,3 +23,4 @@ class Ticket_Details(models.Model):
     description = models.CharField(max_length=256)
     image = models.ImageField(max_length=100)  # to be implemented
     file = models.FileField()  # to be implemented
+
