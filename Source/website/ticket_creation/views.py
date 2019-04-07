@@ -47,12 +47,12 @@ def create_new(request):
                                 description_validity = input_field_test.ticket_description(description)
 
                                 if len(title_validity)==1 and len(description_validity)==1:
+                                        all_tickets = models.All_Tickets(size=0, creator=request.user.id, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
+                                        all_tickets.save()
 
-                                        ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
-                                        ticket.save()
+                                        ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
+                                        ticket_details.save()
                                         messages.add_message(request, messages.SUCCESS, error_message_success)
-                                        email_to_admin(request) # uses mail_admins
-                                        email_to_user(request) # uses send_mail
                                 else:
                                         # input fields are not valid
                                         empty_input_state = False
@@ -83,9 +83,6 @@ def create_new(request):
                                         messages.add_message(request, messages.SUCCESS, error_message)
                                 return render(request, 'ticketcreation/creation.html')
                         else:
-                                q = models.All_Tickets.objects.filter(queue_number=0)
-                                print(q)
-
                                 return render(request, 'ticketcreation/creation.html')
                 else:
                         # user is superuser
