@@ -5,7 +5,7 @@
     </v-btn>
     <v-card>
       <v-card-title>
-        <h2>Add a New Project</h2>
+        <h2>Chat Forum</h2>
       </v-card-title>
       <v-card-text>
           <v-textarea></v-textarea>
