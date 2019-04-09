@@ -10,11 +10,9 @@ To do:
     - Each ticket will have (ticket_id)(size{for first 'ticket' this represent total number of tickets in database})(user)(administrator assigned to ticket)(resolved_by)(read_by)
   - Within each ticket a table will be created "Ticket_{ticket id}", except for the first 'ticket'
     - Each ticket will have (post_id {starting from 0})(title)(description)(more can come later)
-  - Creating initial data for model (first row of All_Ticket)
-    https://docs.djangoproject.com/es/2.1/howto/initial-data/
 
 - Add ticket replying
-- Add image attachment, textfile and pdf attachement to ticket (will need ticket id (and possibly reply$
+- Add image attachment, textfile and pdf attachement to ticket (will need ticket id (and possibly reply))
 - Add email and sms notification
 - Add email and sms notificattion whenever ticket reply/ticket create
 - Add automatic account creation when new ticket is created
