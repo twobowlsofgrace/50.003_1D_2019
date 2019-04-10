@@ -14,7 +14,6 @@ from email_notif.views import email_to_user
 from createuser.models import Extended_User
 from input_field_test import Input_field_test
 
-error_message = None
 error_message_success = "Ticket creation success"
 error_message_empty_input = "Please fill in all input fields"
 error_message_invalid_input = "Please ensure input fields are valid"
@@ -24,72 +23,11 @@ error_message_forbidden_administrator = "This feature is not available to admini
 error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
 error_message_unknown_error = "Unknown error"  # thrown when we cant save ticket into model for some reason
 
+"""
+Note:
+error_message is still needed for zhijun's tests, so don't remove even if we transmit messages to frontend using Message framework
 
-# csrf_exempt so that other websites may access this url without acquiring a csrf token
-@csrf_exempt
-def create_new(request):
-        if (request.user.is_authenticated):
-                # user is logged in
-                if not (request.user.is_superuser):
-                        # user is normal user
-                        if request.method == 'POST':
-                                title_validity = []
-                                description_validity = []
-                                input_field_test = Input_field_test()
-
-                                try:
-                                        title = request.POST.get("title")
-                                        description = request.POST.get('description')
-                                except ValueError:
-                                        pass
-
-                                title_validity = input_field_test.ticket_title(title)
-                                description_validity = input_field_test.ticket_description(description)
-
-                                if len(title_validity)==1 and len(description_validity)==1:
-                                        all_tickets = models.All_Tickets(size=0, creator=request.user.id, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
-                                        all_tickets.save()
-
-                                        ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
-                                        ticket_details.save()
-                                        messages.add_message(request, messages.SUCCESS, error_message_success)
-                                else:
-                                        # input fields are not valid
-                                        empty_input_state = False
-                                        invalid_input_state = False
-                                        invalid_token_state = False
-
-                                        for i in title_validity:
-                                                if i == "empty":
-                                                        empty_input_state = True
-                                                elif i == "invalid value":
-                                                        invalid_input_state = True
-                                        for i in description_validity:
-                                                if i == "empty":
-                                                        empty_input_state = True
-                                                elif i == "invalid value":
-                                                        invalid_input_state = True
-
-                                        if invalid_token_state:
-                                                # wrong token submitted
-                                                error_message = error_message_unauthorised
-                                        elif empty_input_state:
-                                                # input fields are empty
-                                                error_message = error_message_empty_input
-                                        elif invalid_input_state:
-                                                # input fields have invalid input
-                                                error_message = error_message_invalid_input
-
-                                        messages.add_message(request, messages.SUCCESS, error_message)
-                                return render(request, 'ticketcreation/creation.html')
-                        else:
-                                return render(request, 'ticketcreation/creation.html')
-                else:
-                        # user is superuser
-                        return HttpResponseForbidden(error_message_forbidden_administrator)
-        else:
-                return HttpResponseRedirect(reverse("login:index"))
-
+"""
 
 
 # csrf_exempt so that other websites may access this url without acquiring a csrf token
@@ -120,6 +58,7 @@ def create(request):
         token = None  # used in remote creation
         is_remote = None  # used in remote creation
         test_pass = False  # state changed when remote/non-remote input passes
+        error_message = None
 
         # checking if this url is the posting of remote form
         if request.method == 'POST':
@@ -149,9 +88,15 @@ def create(request):
                 token_validity = input_field_test.token(token)
 
                 if (len(username_validity)==1 and len(title_validity)==1 and len(email_validity)==1 and len(description_validity)==1 and len(phonenumber_validity)==1 and len(token_validity)==1):
-                        ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
-                        ticket.save()
-                        messages.add_message(request, messages.SUCCESS, error_message_success)
+                        try:
+                                all_tickets = models.All_Tickets(size=0, creator=0, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
+                                all_tickets.save()
+
+                                ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=0, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
+                                ticket_details.save()
+                                error_message = error_message_success
+                        except Exception:
+                                error_message = error_message_unknown_error
                 else:
                         # input fields are not valid
                         empty_input_state = False
@@ -221,9 +166,13 @@ def create(request):
                                 description_validity = input_field_test.ticket_description(description)
 
                                 if len(title_validity)==1 and len(description_validity)==1:
-                                        ticket = models.Ticket(ticket_id=id, title=title, resolved=0, read=0, description=description, user=request.user.get_username())
-                                        ticket.save()
+                                        all_tickets = models.All_Tickets(size=0, creator=request.user.id, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
+                                        all_tickets.save()
+
+                                        ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
+                                        ticket_details.save()
                                         messages.add_message(request, messages.SUCCESS, error_message_success)
+
                                         email_to_admin(request) # uses mail_admins
                                         email_to_user(request) # uses send_mail
                                 else:
