@@ -33,6 +33,7 @@ arbitrary_user_for_remote_user = 1  # for remote ticket creation, to be set late
 Note:
 error_message is still needed for zhijun's tests, so don't remove even if we transmit messages to frontend using Message framework
 
+request.session is used for data persistence (keeping certain data when moving from one web url to another). key "ticket_id" is assigned a value in GET request to detail() and retrieved in POST request to detail()
 """
 
 
@@ -152,17 +153,15 @@ def create(request):
 
         # user is accessing the ticket_create page explicitly
         elif (request.user.is_authenticated):
-                print("PING")
                 # user is logged in
                 if not (request.user.is_superuser):
                         # user is normal user
                         if request.method == 'POST':
-                                title_validity = []
-                                description_validity = []
                                 input_field_test = Input_field_test()
+                                title = None
+                                description = None
 
                                 try:
-                                        id = 5
                                         title = request.POST.get("title")
                                         description = request.POST.get('description')
                                 except ValueError:
@@ -178,6 +177,7 @@ def create(request):
                                         ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
                                         ticket_details.save()
                                         messages.add_message(request, messages.SUCCESS, error_message_success)
+                                        error_message = error_message_success
 
                                         email_to_admin(request) # uses mail_admins
                                         email_to_user(request) # uses send_mail
@@ -228,9 +228,7 @@ def list(request):
 		# user is logged in
 		if (request.user.is_superuser):
 			# user is superuser
-			print("@@@@@")
 			outputList = []
-
 			# iterate through tickets, lowest queue number first
 			for i in range(highest_queue_number+1):
 				for j in models.All_Tickets.objects.filter(queue_number=i):
@@ -256,8 +254,6 @@ def list(request):
 						outputList.append(each_ticket)
 
 			# list = models.Ticket.objects.all()
-			# return render(request, 'ticketcreation/show.html', {"list": list})
-			print(outputList)
 			return render(request, 'ticketcreation/show.html', {"list":outputList})
 		else:
 			# user is normal user
@@ -267,33 +263,91 @@ def list(request):
 
 
 def detail(request):
+	error_message = None
 	if (request.user.is_authenticated):
 		# user is loggged in
-		if (request.user.is_superuser):
-			# user is superuser
-			# ----- instantiate and declare variables
-			outputList = []
-			id = request.GET.get("id")
+		if request.method == "POST":
+			input_field_test = Input_field_test()
+			title = None
+			description = None
 
-			# ----- retrival of data
-			all_ticket_row = models.All_Tickets.objects.get(id=id)
+			try:
+				title = request.POST.get("title")
+				description = request.POST.get("description")
+			except ValueError:
+				pass
 
-			for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
-				ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
-				ticket_details_row = models.Ticket_Details.objects.get(ticket_id=id, thread_queue_number=i)
+			title_validity = input_field_test.ticket_title(title)
+			description_validity = input_field_test.ticket_description(description)
 
-				ticketDetails["title"] = ticket_details_row.title
-				ticketDetails["id"] = ticket_details_row.id  # id of this ticket/reply (in Ticket_Details)
-				ticketDetails["user"] = ticket_details_row.author  # author of this particular ticket/reply
-				ticketDetails["description"] = ticket_details_row.description
-				ticketDetails["ticket_id"] = ticket_details_row.ticket_id  # id of the ticket that this ticket/reply (in All_Ticket) is tied to
+			if len(title_validity)==1 and len(description_validity)==1:
+				ticket_id = request.session["ticket_id"]  # id of the ticket in All_Tickets
 
-				outputList.append(ticketDetails)
+				# update data of thread under All_Tickets
+				all_tickets_row = models.All_Tickets.objects.get(id=ticket_id)
+				new_queue_number = all_tickets_row.size + 1
+				all_tickets_row.size = new_queue_number
+				all_tickets_row.save()
 
-			return render(request, 'ticketcreation/detail.html', {"item": outputList})
-		else:
-			# user is normal user
-			return HttpResponseRedirect(reverse("home:index"))
+				# creation of new entry into Ticket_Detail
+				ticket_details_row = models.Ticket_Details(ticket_id=ticket_id, thread_queue_number=new_queue_number, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
+				ticket_details_row.save()
+
+				messages.add_message(request, messages.SUCCESS, error_message_success)
+				error_message = error_message_success
+			else:
+				# input fields are not valid
+				empty_input_state = False
+				invalid_input_state = False
+				invalid_token_state = False
+
+				for i in title_validity:
+					if i == "empty":
+						empty_input_state = True
+					elif i == "invalid value":
+						invalid_input_state = True
+				for i in description_validity:
+					if i == "empty":
+						empty_input_state = True
+					elif i == "invalid value":
+						invalid_input_state = True
+
+				if invalid_token_state:
+					# wrong token submitted
+					error_message = error_message_unauthorised
+				elif empty_input_state:
+					# input fields are empty
+					error_message = error_message_empty_input
+				elif invalid_input_state:
+					# input fields have invalid input
+					error_message = error_message_invalid_input
+
+				messages.add_message(request, messages.SUCCESS, error_message)
+
+		# user is retrieving details of form
+		# ----- instantiate and declare variables
+		outputList = []
+		id = request.GET.get("id")
+		request.session["ticket_id"] = id  # set for persistence so that replying tickets can know which ticket thread we're replying to
+
+
+		# ----- retrival of data
+		all_ticket_row = models.All_Tickets.objects.get(id=id)
+
+		for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
+			ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
+			ticket_details_row = models.Ticket_Details.objects.get(ticket_id=id, thread_queue_number=i)
+
+			ticketDetails["title"] = ticket_details_row.title
+			ticketDetails["id"] = ticket_details_row.id  # id of this ticket/reply (in Ticket_Details)
+			ticketDetails["user"] = ticket_details_row.author  # author of this particular ticket/reply
+			ticketDetails["description"] = ticket_details_row.description
+			ticketDetails["ticket_id"] = ticket_details_row.ticket_id  # id of the ticket that this ticket/reply (in All_Ticket) is tied to
+
+			outputList.append(ticketDetails)
+
+		return render(request, 'ticketcreation/detail.html', {"item": outputList, "error_message":error_message})
+
 	else:
 		# user is not logged in
 		return HttpResponseRedirect(reverse("login:index"))
