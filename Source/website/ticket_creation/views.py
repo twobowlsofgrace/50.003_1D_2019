@@ -26,6 +26,8 @@ error_message_forbidden_nonadministrator = "This feature is not available to non
 error_message_unknown_error = "Unknown error"  # thrown when we cant save ticket into model for some reason
 
 highest_queue_number = 5  # (inclusive of the number itself) for iterating tickets along according to queue, a highest queue number is chosen instead of incrementing queue number until there're no more tickets. This is for ease of prototyping (someone might want to make ticket queue number 0 and then queue number 2 during prototyping)
+arbitrary_user_for_remote_user = 1  # for remote ticket creation, to be set later when we automate creation of user account when ticket is submitted
+
 
 """
 Note:
@@ -93,7 +95,7 @@ def create(request):
 
                 if (len(username_validity)==1 and len(title_validity)==1 and len(email_validity)==1 and len(description_validity)==1 and len(phonenumber_validity)==1 and len(token_validity)==1):
                         try:
-                                all_tickets = models.All_Tickets(size=0, creator=0, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
+                                all_tickets = models.All_Tickets(size=0, creator=arbitrary_user_for_remote_user, addressed_by=None, resolved_by=None, read_by=None, queue_number=0, dateTime_created = datetime.datetime.now())
                                 all_tickets.save()
 
                                 ticket_details = models.Ticket_Details(ticket_id=all_tickets.id, thread_queue_number=0, author=0, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
@@ -234,8 +236,8 @@ def list(request):
 					if j.id != None:
 						each_ticket = {"id":None, "user":None, "title":None, "read":None, "resolved":None}
 						each_ticket["id"] = j.id
-						each_ticket["user"] = Extended_User(id=j.creator).username
-						each_ticket["title"] = models.Ticket_Details(ticket_id=j.id, thread_queue_number=0).title
+						each_ticket["user"] = Extended_User.objects.get(id=j.creator).username
+						each_ticket["title"] = models.Ticket_Details.objects.get(ticket_id=j.id, thread_queue_number=0).title
 
 						if j.read_by != None:
 							if request.user.id in j.read_by.split(","):
