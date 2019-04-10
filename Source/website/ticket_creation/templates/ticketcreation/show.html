@@ -33,9 +33,7 @@
     <tbody>
     {% load static %}
     {% for line in list %}
-
       <tr>
-
         <td>{{line.id}}</td>
         <td>{{line.user}}</td>
         <td><a href="/ticket_creation/detail/?id={{ line.id }}" >{{line.title}}</a></td>

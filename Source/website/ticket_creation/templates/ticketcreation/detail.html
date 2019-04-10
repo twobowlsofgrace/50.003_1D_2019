@@ -12,7 +12,7 @@
 
 <div class="dotted">
   <h5>Click to resolve ticket:</h5>
-  <a href="/ticket_creation/resolve/?id={{ item.id }}" type="button" onclick="return clicked();">Resolve</a>
+  <a href="/ticket_creation/resolve/?id={{ item.0.ticket_id }}" type="button" onclick="return clicked();">Resolve</a>
 </div>
 
 {% for row in item %}

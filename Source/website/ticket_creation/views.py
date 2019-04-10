@@ -223,7 +223,6 @@ def create(request):
 
 
 def list(request):
-	# NOT DONE - minimise code's access to mysql table
 	if (request.user.is_authenticated):
 		# user is logged in
 		if (request.user.is_superuser):
@@ -266,10 +265,14 @@ def detail(request):
 	error_message = None
 	if (request.user.is_authenticated):
 		# user is loggged in
+		ticket_id = request.GET.get("id")  # this works even when submitting replies cos the url is still the same, and "id" is retrieved from the url
+
 		if request.method == "POST":
+			# user is posting reply to ticket
 			input_field_test = Input_field_test()
 			title = None
 			description = None
+
 
 			try:
 				title = request.POST.get("title")
@@ -281,8 +284,6 @@ def detail(request):
 			description_validity = input_field_test.ticket_description(description)
 
 			if len(title_validity)==1 and len(description_validity)==1:
-				ticket_id = request.session["ticket_id"]  # id of the ticket in All_Tickets
-
 				# update data of thread under All_Tickets
 				all_tickets_row = models.All_Tickets.objects.get(id=ticket_id)
 				new_queue_number = all_tickets_row.size + 1
@@ -324,29 +325,29 @@ def detail(request):
 
 				messages.add_message(request, messages.SUCCESS, error_message)
 
-		# user is retrieving details of form
-		# ----- instantiate and declare variables
-		outputList = []
-		id = request.GET.get("id")
-		request.session["ticket_id"] = id  # set for persistence so that replying tickets can know which ticket thread we're replying to
+				return HttpResponseRedirect(reverse("ticket_creation:detail")+"?id={0}".format(ticket_id))
 
+		else:
+			# user is retrieving the message thread of a ticket
+			# ----- instantiate and declare variables
+			outputList = []
 
-		# ----- retrival of data
-		all_ticket_row = models.All_Tickets.objects.get(id=id)
+			# ----- retrival of data
+			all_ticket_row = models.All_Tickets.objects.get(id=ticket_id)
 
-		for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
-			ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
-			ticket_details_row = models.Ticket_Details.objects.get(ticket_id=id, thread_queue_number=i)
+			for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
+				ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
+				ticket_details_row = models.Ticket_Details.objects.get(ticket_id=ticket_id, thread_queue_number=i)
 
-			ticketDetails["title"] = ticket_details_row.title
-			ticketDetails["id"] = ticket_details_row.id  # id of this ticket/reply (in Ticket_Details)
-			ticketDetails["user"] = ticket_details_row.author  # author of this particular ticket/reply
-			ticketDetails["description"] = ticket_details_row.description
-			ticketDetails["ticket_id"] = ticket_details_row.ticket_id  # id of the ticket that this ticket/reply (in All_Ticket) is tied to
+				ticketDetails["title"] = ticket_details_row.title
+				ticketDetails["id"] = ticket_details_row.id  # id of this ticket/reply (in Ticket_Details)
+				ticketDetails["user"] = ticket_details_row.author  # author of this particular ticket/reply
+				ticketDetails["description"] = ticket_details_row.description
+				ticketDetails["ticket_id"] = ticket_details_row.ticket_id  # id of the ticket that this ticket/reply (in All_Ticket) is tied to
 
-			outputList.append(ticketDetails)
+				outputList.append(ticketDetails)
 
-		return render(request, 'ticketcreation/detail.html', {"item": outputList, "error_message":error_message})
+			return render(request, 'ticketcreation/detail.html', {"item": outputList})
 
 	else:
 		# user is not logged in
@@ -360,10 +361,10 @@ def delete(request):
                 if (request.user.is_superuser):
                         # user is superuser
                         column_id = request.GET.get("id")
-                        print(column_id)
-                        line = models.Ticket.objects.filter(id=column_id).delete()
-                        list = models.Ticket.objects.all()
-                        return render(request, 'ticketcreation/show.html', {"list": list})
+                        models.All_Tickets.objects.filter(id=column_id).delete()
+                        models.Ticket_Details.objects.filter(ticket_id=column_id).delete()
+
+                        return HttpResponseRedirect(reverse("ticket_creation:display"))
                 else:
                         # user is normal user
                         return HttpResponseRedirect(reverse("home:index"))
@@ -378,13 +379,10 @@ def resolve(request):
 		# user is logged in
 		if (request.user.is_superuser):
 			column_id = request.GET.get("id")
-			try:
-				models.Ticket.objects.filter(id=column_id).update(resolved=1)
+			models.All_Tickets.objects.filter(id=column_id).update(resolved_by=request.user.id)
 
-			except:
-				raise HttpResponse(0)
-			list = models.Ticket.objects.all()
-			return render(request, 'ticketcreation/show.html', {"list": list})
+			return HttpResponseRedirect(reverse("ticket_creation:display"))
+			# return render(request, 'ticketcreation/show.html', {"list": list})
 		else:
 			# user is normal user
 			return HttpResponseRedirect(reverse("home:index"))
