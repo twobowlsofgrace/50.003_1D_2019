@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from . import models
+from createuser.models import Extended_User
+
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from email_notif.views import email_from_admin
@@ -22,6 +24,8 @@ error_message_unauthorised = "Not authorised"  # used if the token sent by form 
 error_message_forbidden_administrator = "This feature is not available to administrators"
 error_message_forbidden_nonadministrator = "This feature is not available to non-administrators"
 error_message_unknown_error = "Unknown error"  # thrown when we cant save ticket into model for some reason
+
+highest_queue_number = 5  # (inclusive of the number itself) for iterating tickets along according to queue, a highest queue number is chosen instead of incrementing queue number until there're no more tickets. This is for ease of prototyping (someone might want to make ticket queue number 0 and then queue number 2 during prototyping)
 
 """
 Note:
@@ -221,8 +225,37 @@ def list(request):
 		# user is logged in
 		if (request.user.is_superuser):
 			# user is superuser
-			list = models.Ticket.objects.all()
-			return render(request, 'ticketcreation/show.html', {"list": list})
+			print("@@@@@")
+			outputList = []
+
+			# iterate through tickets, lowest queue number first
+			for i in range(highest_queue_number+1):
+				for j in models.All_Tickets.objects.filter(queue_number=i):
+					if j.id != None:
+						each_ticket = {"id":None, "user":None, "title":None, "read":None, "resolved":None}
+						each_ticket["id"] = j.id
+						each_ticket["user"] = Extended_User(id=j.creator).username
+						each_ticket["title"] = models.Ticket_Details(ticket_id=j.id, thread_queue_number=0).title
+
+						if j.read_by != None:
+							if request.user.id in j.read_by.split(","):
+								each_ticket["read"] = True
+							else:
+								each_ticket["read"] = False
+						else:  # if no one has read it at all (read_by defaults to None)
+							each_ticket["read"] = False
+
+						if j.resolved_by != None:
+							each_ticket["resolved"] = True
+						else:
+							each_ticket["resolved"] = False
+
+						outputList.append(each_ticket)
+
+			# list = models.Ticket.objects.all()
+			# return render(request, 'ticketcreation/show.html', {"list": list})
+			print(outputList)
+			return render(request, 'ticketcreation/show.html', {"list":outputList})
 		else:
 			# user is normal user
 			return HttpResponseForbidden()
