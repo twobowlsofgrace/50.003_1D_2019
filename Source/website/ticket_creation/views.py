@@ -223,6 +223,7 @@ def create(request):
 
 
 def list(request):
+	# NOT DONE - minimise code's access to mysql table
 	if (request.user.is_authenticated):
 		# user is logged in
 		if (request.user.is_superuser):
@@ -236,7 +237,7 @@ def list(request):
 					if j.id != None:
 						each_ticket = {"id":None, "user":None, "title":None, "read":None, "resolved":None}
 						each_ticket["id"] = j.id
-						each_ticket["user"] = Extended_User.objects.get(id=j.creator).username
+						each_ticket["user"] = Extended_User.objects.get(id=j.creator).username  # get() is used instead of filter() as get() only returns one table entry
 						each_ticket["title"] = models.Ticket_Details.objects.get(ticket_id=j.id, thread_queue_number=0).title
 
 						if j.read_by != None:
@@ -266,23 +267,36 @@ def list(request):
 
 
 def detail(request):
-        if (request.user.is_authenticated):
-                # user is loggged in
-                if (request.user.is_superuser):
-                        # user is superuser
-                        id = request.GET.get("id")
-                        try:
-                                models.Ticket.objects.filter(id=id).update(read=1)
-                                item = models.Ticket.objects.all().filter(id=id)
-                        except:
-                                raise HttpResponse(0)
-                        return render(request, 'ticketcreation/detail.html', {"item": item[0]})
-                else:
-                        # user is normal user
-                        return HttpResponseRedirect(reverse("home:index"))
-        else:
-                # user is not logged in
-                return HttpResponseRedirect(reverse("login:index"))
+	if (request.user.is_authenticated):
+		# user is loggged in
+		if (request.user.is_superuser):
+			# user is superuser
+			# ----- instantiate and declare variables
+			outputList = []
+			id = request.GET.get("id")
+
+			# ----- retrival of data
+			all_ticket_row = models.All_Tickets.objects.get(id=id)
+
+			for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
+				ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
+				ticket_details_row = models.Ticket_Details.objects.get(ticket_id=id, thread_queue_number=i)
+
+				ticketDetails["title"] = ticket_details_row.title
+				ticketDetails["id"] = ticket_details_row.id  # id of this ticket/reply (in Ticket_Details)
+				ticketDetails["user"] = ticket_details_row.author  # author of this particular ticket/reply
+				ticketDetails["description"] = ticket_details_row.description
+				ticketDetails["ticket_id"] = ticket_details_row.ticket_id  # id of the ticket that this ticket/reply (in All_Ticket) is tied to
+
+				outputList.append(ticketDetails)
+
+			return render(request, 'ticketcreation/detail.html', {"item": outputList})
+		else:
+			# user is normal user
+			return HttpResponseRedirect(reverse("home:index"))
+	else:
+		# user is not logged in
+		return HttpResponseRedirect(reverse("login:index"))
 
 
 
