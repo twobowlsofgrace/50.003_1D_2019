@@ -7,16 +7,18 @@ Whenever a new use case is being worked on, create a new branch, and only merge 
 $ python manage.py createsuperuser --username=joe --email=joe@example.com
 ```
 
+### To test connection between TestForm and Source websites (27/3/19)
+Purpose of the creation of TestForm: To automate creation of tickets through submitting forms in a separate website. NOTE: User account has not been created yet.
 
-### Recent Changes (9/2/19)
-- Rewritten website using Django (sorry again for not agreeing on this earlier).
-  - Website currently contains 2 folders
-    - my_project contains the network and website settings
-    - templates contains html files that are displayed when we load the site
-  - To run website locally, get into website/ dir and execute:
-    python3 manage.py runserver
-- As we'll have to display the usage of the website across multiple users at the same time, it would be a better idea to host the website somewhere instead of locally. To this end I recommend we use a free service called Heroku to do this (to be implemented).
-- As each of us have different python modules (including the server in Heroku), it is a good time to learn about Dockers, a solution that abstracts dependencies, and any codes required to run prior to the start of the website. With dockers the website, we script the downloading of dependencies and run any codes that is required prior to the set up of the website once, so that in the future we can kickstart websites with just a line of code. This is still something I'm working on, but it will be a good idea for you to read some guides below to get an idea of what Dockers is about.
+In one console, run the Source website in port 3000
+```
+$ python3 manage.py runserver 3000
+```
+In another console, run the TestForm website in port 4000
+```
+$ python3 manage.py runserver 4000
+```
+
 
 ### Getting Around
 - Documentations and project requirements are stored in ./Documentation
