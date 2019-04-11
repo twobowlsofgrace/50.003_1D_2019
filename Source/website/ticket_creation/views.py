@@ -28,12 +28,12 @@ error_message_unknown_error = "Unknown error"  # thrown when we cant save ticket
 highest_queue_number = 5  # (inclusive of the number itself) for iterating tickets along according to queue, a highest queue number is chosen instead of incrementing queue number until there're no more tickets. This is for ease of prototyping (someone might want to make ticket queue number 0 and then queue number 2 during prototyping)
 arbitrary_user_for_remote_user = 1  # for remote ticket creation, to be set later when we automate creation of user account when ticket is submitted
 
+no_assigned_admin = "No admin allocated yet"  # used in selected_list, as value of the admin that is assigned to review the ticket
+
 
 """
 Note:
 error_message is still needed for zhijun's tests, so don't remove even if we transmit messages to frontend using Message framework
-
-request.session is used for data persistence (keeping certain data when moving from one web url to another). key "ticket_id" is assigned a value in GET request to detail() and retrieved in POST request to detail()
 """
 
 
@@ -223,36 +223,16 @@ def create(request):
 
 
 def list(request):
+	"""
+	Used exclusively by admin to view all available tickets
+	"""
 	if (request.user.is_authenticated):
 		# user is logged in
+		outputList = []
+
 		if (request.user.is_superuser):
-			# user is superuser
-			outputList = []
-			# iterate through tickets, lowest queue number first
-			for i in range(highest_queue_number+1):
-				for j in models.All_Tickets.objects.filter(queue_number=i):
-					if j.id != None:
-						each_ticket = {"id":None, "user":None, "title":None, "read":None, "resolved":None}
-						each_ticket["id"] = j.id
-						each_ticket["user"] = Extended_User.objects.get(id=j.creator).username  # get() is used instead of filter() as get() only returns one table entry
-						each_ticket["title"] = models.Ticket_Details.objects.get(ticket_id=j.id, thread_queue_number=0).title
+			outputList = sort_ticket_list(request, models.All_Tickets.objects.all(), request.user.is_superuser)
 
-						if j.read_by != None:
-							if request.user.id in j.read_by.split(","):
-								each_ticket["read"] = True
-							else:
-								each_ticket["read"] = False
-						else:  # if no one has read it at all (read_by defaults to None)
-							each_ticket["read"] = False
-
-						if j.resolved_by != None:
-							each_ticket["resolved"] = True
-						else:
-							each_ticket["resolved"] = False
-
-						outputList.append(each_ticket)
-
-			# list = models.Ticket.objects.all()
 			return render(request, 'ticketcreation/show.html', {"list":outputList})
 		else:
 			# user is normal user
@@ -260,6 +240,31 @@ def list(request):
 	else:
 		return HttpResponseRedirect(reverse("login:index"))
 
+def selected_list(request):
+	"""
+	Used for non-admin and admin users to see a list of tickets they are assigned to/they have submitted
+	This is not combined with list() as the admin would have 2 different ways of using this function. Without 
+	adding new information to the url that request this, it would be impossible to differentiate when the admin needs one of the two functions
+	"""
+	if (request.user.is_authenticated):
+		outputList = []  # list of dictionaries of ticket details
+
+		if (request.user.is_superuser):
+			# User is admin
+			querySet = models.All_Tickets.objects.filter(addressed_by=request.user.id)
+			if querySet != None:
+				outputList = sort_ticket_list(request, querySet, request.user.is_superuser)
+
+		else:
+			# User is non-admin
+			querySet = models.All_Tickets.objects.filter(creator=request.user.id)
+			if querySet != None:
+				outputList = sort_ticket_list(request, querySet, request.user.is_superuser)
+
+		return render(request, 'ticketcreation/show.html', {"list":outputList})
+	else:
+		# user is not authenticated
+		return HttpResponseRedirect(reverse("login:index"))
 
 def detail(request):
 	error_message = None
@@ -272,6 +277,7 @@ def detail(request):
 			input_field_test = Input_field_test()
 			title = None
 			description = None
+			all_tickets_row = None
 
 
 			try:
@@ -293,6 +299,15 @@ def detail(request):
 				# creation of new entry into Ticket_Detail
 				ticket_details_row = models.Ticket_Details(ticket_id=ticket_id, thread_queue_number=new_queue_number, author=request.user.id, title=title, description=description, image=None, file=None, dateTime_created=datetime.datetime.now())
 				ticket_details_row.save()
+
+				# updating read_by attribute of All_Ticket to be only read by the user posting the reply
+				# updating addressed by to the first admin that replies if addressed_by==None
+				all_tickets_row.read_by = str(request.user.id)+","
+				if (request.user.is_superuser):
+					addressed_by = all_tickets_row.addressed_by
+					if addressed_by == None:
+						all_tickets_row.addressed_by = request.user.id
+						all_tickets_row.save()
 
 				messages.add_message(request, messages.SUCCESS, error_message_success)
 				error_message = error_message_success
@@ -325,17 +340,18 @@ def detail(request):
 
 				messages.add_message(request, messages.SUCCESS, error_message)
 
-				return HttpResponseRedirect(reverse("ticket_creation:detail")+"?id={0}".format(ticket_id))
+			return HttpResponseRedirect(reverse("ticket_creation:detail")+"?id={0}".format(ticket_id))
 
 		else:
 			# user is retrieving the message thread of a ticket
 			# ----- instantiate and declare variables
 			outputList = []
+			all_tickets_data = {}
 
 			# ----- retrival of data
-			all_ticket_row = models.All_Tickets.objects.get(id=ticket_id)
+			all_tickets_row = models.All_Tickets.objects.get(id=ticket_id)
 
-			for i in range(all_ticket_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
+			for i in range(all_tickets_row.size+1):   # note that index=0 and index=size both represents some ticket/reply
 				ticketDetails = {"title":None, "id":None, "user":None, "description":None, "ticket_id":None}
 				ticket_details_row = models.Ticket_Details.objects.get(ticket_id=ticket_id, thread_queue_number=i)
 
@@ -347,7 +363,21 @@ def detail(request):
 
 				outputList.append(ticketDetails)
 
-			return render(request, 'ticketcreation/detail.html', {"item": outputList})
+			# updating read_by attribute of All_Ticket to include the current user
+			read_by = all_tickets_row.read_by
+			if read_by == None:
+				all_tickets_row.read_by = str(request.user.id)+","
+			else:
+				if request.user.id in all_tickets_row.read_by.split(","):
+					pass
+				else:
+					all_tickets_row.read_by += str(request.user.id)+","
+			all_tickets_row.save()
+
+			# fill up all_tickets_data
+			all_tickets_data["resolved_by"] = all_tickets_row.resolved_by
+
+			return render(request, 'ticketcreation/detail.html', {"item": outputList, "all_tickets_data":all_tickets_data})
 
 	else:
 		# user is not logged in
@@ -372,8 +402,6 @@ def delete(request):
                 # user is not logged in
                 return HttpResponseRedirect(reverse("login:index"))
 
-
-
 def resolve(request):
 	if (request.user.is_authenticated):
 		# user is logged in
@@ -388,3 +416,88 @@ def resolve(request):
 			return HttpResponseRedirect(reverse("home:index"))
 	else:
 		return HttpResponseRedirect(reverse("login:index"))
+
+def sort_ticket_list(request, querySetObj, is_superuser):
+	"""
+	Private function used by list() and selected_list()
+
+	Takes a list of QuerySet objects (specifically elements in the Ticket_Details table), sorts through accordingly and
+	outputs ordered list of ticket details
+
+	Order:
+	All unread tickets
+		unresolved tickets
+			according to priority queue
+		resolved tickets
+			according to priority queue
+	All read tickets
+		unresolved tickets
+			according to priority queue
+		resolved tickets
+			according to priority queue
+
+	"""
+	outputList = []
+	readList = [[],[]]  # unresolved tickets, resolved tickets
+	nonreadList = [[],[]]  # unresolved tickets, resolved tickets
+
+	for i in range(highest_queue_number+1):
+		for j in querySetObj.filter(queue_number=i):
+			if j.id != None:
+				read_state = False
+				resolve_state = False
+
+				if j.read_by != None:
+					if str(request.user.id) in j.read_by.split(","):
+						read_state = True
+					else:
+						read_state = False
+				else:
+					read_state = False
+
+				if j.resolved_by != None:
+					resolve_state = True
+				else:
+					resolve_state = False
+
+				if read_state and not resolve_state:
+					readList[0].append(j)
+				elif read_state and resolve_state:
+					readList[1].append(j)
+				elif not read_state and not resolve_state:
+					nonreadList[0].append(j)
+				elif not read_state and resolve_state:
+					nonreadList[1].append(j)
+
+	for i in nonreadList,readList:  # first nonreadList, then readList
+		for j in i:  # first unresolved tickets, then resolved tickets
+			for k in j:  # for all elements in unresolved/resolved tickets
+				each_ticket = {"id":None, "user":None, "title":None, "read":None, "resolved":None}
+				each_ticket["id"] = k.id
+
+				if (is_superuser):
+					if k.resolved_by != None:
+						each_ticket["user"] = Extended_User.objects.get(id=k.creator)  # in the perspective of the admin, this will display author of ticket
+					else:
+						each_ticket["user"] = no_assigned_admin
+				else:
+					if k.resolved_by != None:
+						each_ticket["user"] = Extended_User.objects.get(id=k.resolved_by)  # in the perspective of the user, this will display the name of the admin addressing the issue
+					else:
+						each_ticket["user"] = no_assigned_admin
+
+				each_ticket["title"] = models.Ticket_Details.objects.get(ticket_id=k.id, thread_queue_number=0).title
+
+				if k.read_by != None:
+					each_ticket["read"] = str(request.user.id) in k.read_by.split(",")
+				else:
+					each_ticket["read"] = False
+
+				if k.resolved_by == None:
+					each_ticket["resolved"] = False
+				else:
+					each_ticket["resolved"] = True
+
+				outputList.append(each_ticket)
+
+	return outputList
