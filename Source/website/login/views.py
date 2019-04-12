@@ -78,7 +78,11 @@ def index(request):
 
 	messages.error(request, error_message)
 	return render(request, 'login.html', {'form':LoginForm(), 'error_message':error_message})
+	#return render(request, 'login.html')
 
 def log_out(request):
 	logout(request)
 	return HttpResponseRedirect(reverse('login:index'))
+
+def enter(request):
+	return render(request, "login/Entrance.html")

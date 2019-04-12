@@ -9,6 +9,7 @@ from createuser.models import Extended_User
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.template import RequestContext
 from email_notif.views import email_from_admin
 from email_notif.views import email_to_admin
 from email_notif.views import email_to_user
@@ -155,11 +156,19 @@ def create(request):
         elif (request.user.is_authenticated):
                 # user is logged in
                 if not (request.user.is_superuser):
+                        # username = request.POST.get("username")
+                #        username = request.GET.get("username")
+
+                        username = request.user.get_username()
+			# print(request.user)
+			
+
                         # user is normal user
                         if request.method == 'POST':
                                 input_field_test = Input_field_test()
                                 title = None
                                 description = None
+
 
                                 try:
                                         title = request.POST.get("title")
@@ -180,7 +189,7 @@ def create(request):
                                         error_message = error_message_success
 
                                         email_to_admin(request) # uses mail_admins
-                                        email_to_user(request) # uses send_mail
+                                        # email_to_user(request) # uses send_mail
                                 else:
                                         # input fields are not valid
                                         empty_input_state = False
@@ -209,12 +218,13 @@ def create(request):
                                                 error_message = error_message_invalid_input
 
                                         messages.add_message(request, messages.SUCCESS, error_message)
-                                return render(request, 'ticketcreation/creation.html')
+                                return render(request, 'createticketform.html', {"username":username} )
                         else:
                                 q = models.All_Tickets.objects.filter(queue_number=0)
                                 print(q)
 
-                                return render(request, 'ticketcreation/creation.html')
+                                
+                                return render(request, 'createticketform.html',{"username":username} )
                 else:
                         # user is superuser
                         return HttpResponseForbidden(error_message_forbidden_administrator)

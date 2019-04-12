@@ -60,9 +60,11 @@ ROOT_URLCONF = 'my_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'home/templates'),
-                 os.path.join(BASE_DIR, 'login/templates'),
-                 os.path.join(BASE_DIR, 'createuser/templates')],
+        # 'DIRS': [os.path.join(BASE_DIR, 'home/templates'),
+        #          os.path.join(BASE_DIR, 'login/templates'),
+        #          os.path.join(BASE_DIR, 'createuser/templates')],
+        'DIRS':[os.path.join(BASE_DIR,'templates'),
+                os.path.join(BASE_DIR, 'home/templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -152,6 +154,12 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = "pleasedontlockthisemailthanks@gmail.com"
 EMAIL_HOST_PASSWORD = "e@5yp@55w0rd"
 SERVER_EMAIL = "pleasedontlockthisemailthanks@gmail.com"
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.join(HERE, '../')
+STATICFILES_DIRS = (
+    os.path.join(HERE, 'static/'),
+)
 
 
 # # Testing Email backend?????
